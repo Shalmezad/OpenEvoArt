@@ -2,15 +2,22 @@ require 'chunky_png'
 require_relative 'config'
 
 class Artist
+
+  attr_accessor :id
+
+  @@last_used_artist_id = 1
   def initialize
     # Make a random program string:
-    prog = []
-    prog << [0,1,1] # Returns X (node 2)
-    prog << [0,1,2] # Returns Y (node 3)
-    prog << [3] # Output 1 = node 3 (Y)
-    prog << [3] # Output 2 = node 3 (Y)
-    prog << [2] # Output 3 = node 2 (X)
-    @program = prog.flatten.join(" ")
+    #prog = []
+    #prog << [0,1,1] # Returns X (node 2)
+    #prog << [0,1,2] # Returns Y (node 3)
+    #prog << [3] # Output 1 = node 3 (Y)
+    #prog << [3] # Output 2 = node 3 (Y)
+    #prog << [2] # Output 3 = node 2 (X)
+    #@program = prog.flatten.join(" ")
+    @program = CGPProgram.random_program(2,3,50)
+    @id = @@last_used_artist_id
+    @@last_used_artist_id += 1
   end
 
   # Returns a chunky_png image

@@ -1,5 +1,32 @@
 require_relative 'config'
 class CGPProgram
+
+  NUM_OPERATORS = 6
+
+  def self.random_program(num_in, num_out, num_mid)
+    # Alright, we need to build a random program:
+    # So, let's build each of the middle ones:
+    prog = []
+    num_mid.times do |i|
+      # Our index is actual num_in + i
+      index = num_in + i
+      # We can use any nodes before our index
+      lhs = (rand() * index).to_i
+      rhs = (rand() * index).to_i
+      # And choose an operator:
+      op = (rand() * NUM_OPERATORS).to_i
+      # And add it to our program:
+      prog << [lhs, rhs, op]
+    end
+    # Now, we need our outputs:
+    num_out.times do |i|
+      # Can be anything before the outputs:
+      source = (rand() * (num_in + num_mid)).to_i
+      prog << source
+    end
+    return prog.flatten.join(" ")
+  end
+
   def initialize(str, num_inputs, num_outputs)
     @num_inputs = num_inputs
     @num_outputs = num_outputs
@@ -24,7 +51,6 @@ class CGPProgram
       puts "  Output sources: #{@output_sources.join(" ")}"
     end
   end
-
 
   def evaluate(inputs)
     # Alright, now the fun part.
@@ -64,12 +90,19 @@ class CGPProgram
       puts "RHS: #{rhs}"
       puts "OP: #{op}"
     end
-    if op == 1
+    # To help keep things under control, everything will be kept [0-1]
+    if op == 0
       result = lhs
-    elsif op == 2
+    elsif op == 1
       result = rhs
+    elsif op == 2
+      result = Math.sqrt((lhs + rhs)/2)
     elsif op == 3
-      result = Math.sqrt(lhs + rhs)
+      result = Math.sqrt((lhs-rhs).abs)
+    elsif op == 4
+      result = [lhs + rhs,1].min
+    elsif op == 5
+      result = (lhs-rhs).abs
     else
       raise "Unknown operator #{op}"
     end
