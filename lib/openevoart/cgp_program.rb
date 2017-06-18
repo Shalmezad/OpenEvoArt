@@ -43,6 +43,9 @@ class CGPProgram
 
     # Finally, we'll get our outputs:
     outputs = @output_sources.map{|x| @memory[x]}
+    # For sanity sake, we're going to limit to [0-1]
+    # Sneaky clamp method:
+    outputs = outputs.map{|o| [0, o, 1].sort[1] }
     return outputs
   end
 
