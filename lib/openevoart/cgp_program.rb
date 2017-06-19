@@ -1,7 +1,7 @@
 require_relative 'config'
 class CGPProgram
 
-  NUM_OPERATORS = 6
+  NUM_OPERATORS = 8
 
   def self.random_program(num_in, num_out, num_mid)
     # Alright, we need to build a random program:
@@ -103,6 +103,10 @@ class CGPProgram
       result = [lhs + rhs,1].min
     elsif op == 5
       result = (lhs-rhs).abs
+    elsif op == 6
+      result = (1-lhs).abs
+    elsif op == 7
+      result = (1-rhs).abs
     else
       raise "Unknown operator #{op}"
     end

@@ -4,6 +4,7 @@ require_relative 'config'
 class Artist
 
   attr_accessor :id
+  attr_accessor :program
 
   @@last_used_artist_id = 1
   def initialize
