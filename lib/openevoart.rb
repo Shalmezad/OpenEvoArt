@@ -3,6 +3,7 @@ require 'chunky_png'
 require_relative 'openevoart/artist'
 require_relative 'openevoart/critic'
 require_relative 'openevoart/cgp_program'
+require_relative 'openevoart/open_evo'
 
 # For making wallpapers:
 # ex: redraw_image("out/#{i}.txt")
@@ -15,6 +16,7 @@ end
 
 def main
   # Let's test writing an image:
+=begin
   critic = Critic.new
   100.times do
     artist = Artist.new
@@ -24,6 +26,9 @@ def main
     rating = critic.rate(png)
     puts "#{artist.id} rating: #{rating}"
   end
+=end
+  oe = OpenEvo.new
+  oe.step
 
 end
 

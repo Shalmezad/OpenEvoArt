@@ -96,7 +96,7 @@ class CGPProgram
     elsif op == 1
       result = rhs
     elsif op == 2
-      result = Math.sqrt((lhs + rhs)/2)
+      result = Math.sqrt(((lhs + rhs)/2).abs)
     elsif op == 3
       result = Math.sqrt((lhs-rhs).abs)
     elsif op == 4
