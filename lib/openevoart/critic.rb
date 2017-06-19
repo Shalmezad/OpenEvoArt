@@ -9,7 +9,7 @@ class Critic
 
   def initialize
     # 5 in (x,y,h,s,v), 1 out (rating)
-    @program = CGPProgram.random_program(5,1,50)
+    @program = CGPProgram.random_program(5,1,Config::middle_node_count)
     @id = @@last_used_critic_id
     @@last_used_critic_id += 1
   end

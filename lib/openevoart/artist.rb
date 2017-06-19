@@ -9,7 +9,7 @@ class Artist
   @@last_used_artist_id = 1
   def initialize
     # Make a random program string:
-    @program = CGPProgram.random_program(2,3,50)
+    @program = CGPProgram.random_program(2,3,Config::middle_node_count)
     @id = @@last_used_artist_id
     @@last_used_artist_id += 1
   end

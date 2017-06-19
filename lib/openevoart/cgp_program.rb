@@ -3,6 +3,9 @@ class CGPProgram
 
   NUM_OPERATORS = 8
 
+  attr_accessor :middle_tokens
+  attr_accessor :output_sources
+
   def self.random_program(num_in, num_out, num_mid)
     # Alright, we need to build a random program:
     # So, let's build each of the middle ones:
@@ -25,6 +28,38 @@ class CGPProgram
       prog << source
     end
     return prog.flatten.join(" ")
+  end
+
+  def self.mutate(prog_str, num_in, num_out)
+    # Make a temporary program:
+    prog = CGPProgram.new(prog_str, num_in, num_out)
+    middle = prog.middle_tokens
+    outs = prog.output_sources
+    # Go through each middle node:
+    middle.each_with_index do |node, i|
+      index = num_in + i
+      # Should we mutate lhs?
+      if rand() < Config::mutate_chance
+        middle[i][0] = (rand() * index).to_i
+      end
+      # rhs?
+      if rand() < Config::mutate_chance
+        middle[i][1] = (rand() * index).to_i
+      end
+      # op
+      if rand() < Config::mutate_chance
+        middle[i][2] = (rand() * NUM_OPERATORS).to_i
+      end
+    end
+    # Go through each output:
+    outs.each_with_index do |out, i|
+      if rand() < Config::mutate_chance
+        outs[i] = (rand() * (num_in + middle.size)).to_i
+      end
+    end
+
+    return (middle + outs).flatten.join(" ")
+
   end
 
   def initialize(str, num_inputs, num_outputs)

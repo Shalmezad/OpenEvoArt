@@ -31,6 +31,15 @@ class OpenEvo
     # If we have a positive rating, we can move on:
     if positive_rating
       puts "Art moving on"
+      # Make a child:
+      new_prog = CGPProgram.mutate(artist.program, 2,3)
+      new_artist = Artist.new
+      new_artist.program = new_prog
+      @artist_pool << new_artist
+      # Should we put ourselves on?
+      if @artist_pool.size < Config::artist_max_size
+        @artist_pool << artist
+      end
     else
       puts "Starving artist passed away"
     end
@@ -44,7 +53,52 @@ class OpenEvo
   end
 
   def run_critic_step
-    # TODO: code me!
+    # dequeue a critic
+    critic = @critic_pool.shift
+    # We're going to see if we're a fair critic
+    has_positive = false
+    has_negative = false
+    # Go through each of our artists:
+    @artist_pool.each do |artist|
+      rating = critic.rate(artist.draw)
+      if rating > 0.5
+        has_positive = true
+      elsif rating < 0.5
+        has_negative = true
+      end
+      # If we were fair, we're done:
+      if has_positive && has_negative
+        break
+      end
+    end
+    # If we were fair, we can move on:
+    if has_positive && has_negative
+      puts "Critic moving on"
+      # Make a child:
+      new_prog = CGPProgram.mutate(critic.program, 5,1)
+      new_critic = Critic.new
+      new_critic.program = new_prog
+      @critic_pool << new_critic
+      # Should we put ourselves on?
+      if @critic_pool.size < Config::critic_max_size
+        @critic_pool << critic
+      end
+
+    elsif has_positive
+      puts "Critic liked everything, useless"
+    elsif has_negative
+      puts "Critic disliked everything, useless"
+    else
+      puts "Critic is unsure rock, useless"
+    end
+
+    # Do we need genesis?
+    while @critic_pool.size < Config::critic_min_size do
+      puts "Not enough critics!"
+      @critic_pool << Critic.new
+    end
+
+
   end
 
 

@@ -15,21 +15,10 @@ def redraw_image(file)
 end
 
 def main
-  # Let's test writing an image:
-=begin
-  critic = Critic.new
-  100.times do
-    artist = Artist.new
-    png = artist.draw
-    png.save("out/#{artist.id}.png")
-    open("out/#{artist.id}.txt", "w"){|f| f << artist.program}
-    rating = critic.rate(png)
-    puts "#{artist.id} rating: #{rating}"
-  end
-=end
   oe = OpenEvo.new
-  oe.step
-
+  10000.times do
+    oe.step
+  end
 end
 
 
