@@ -113,6 +113,12 @@ class CGPProgram
     if Config::debug_cgp
       puts "Result: #{result}"
     end
-    return result
+    return [0, result, 1].sort[1]
+  rescue => ex
+    puts "Error:"
+    puts "LHS: #{lhs}"
+    puts "RHS: #{rhs}"
+    puts "OP: #{op}"
+    raise
   end
 end
