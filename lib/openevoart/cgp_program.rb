@@ -1,7 +1,35 @@
-require_relative 'config'
 class CGPProgram
+  OPERATIONS = [
+    # Just left
+    lambda{|x,y| x},
+    # Just right
+    lambda{|x,y| y},
+    # sqrt x + y:
+    lambda{|x,y| Math.sqrt(((x + y)/2).abs)},
+    # sqrt x - y:
+    lambda{|x,y| Math.sqrt((x-y).abs)},
+    # l + r:
+    lambda{|x,y| [x + y,1].min},
+    # l - r:
+    lambda{|x,y| (x - y).abs},
+    # 1 - l
+    lambda{|x,y| (1-x).abs},
+    # 1 - r
+    lambda{|x,y| (1-y).abs}#,
+    # 1
+    #lambda{|x,y| 1},
+    # 0
+    #lambda{|x,y| 0},
+    # 0.5
+    #lambda{|x,y| 0.5},
+    # x > y
+    #lambda{|x,y| x > y ? 1 : 0},
+    # x < y
+    #lambda{|x,y| x < y ? 1 : 0}
 
-  NUM_OPERATORS = 8
+  ]
+
+  NUM_OPERATORS = OPERATIONS.size
 
   attr_accessor :middle_tokens
   attr_accessor :output_sources
@@ -30,7 +58,7 @@ class CGPProgram
     return prog.flatten.join(" ")
   end
 
-  def self.mutate(prog_str, num_in, num_out)
+  def self.mutate(prog_str, num_in, num_out, mutate_chance = 0.05)
     # Make a temporary program:
     prog = CGPProgram.new(prog_str, num_in, num_out)
     middle = prog.middle_tokens
@@ -39,21 +67,21 @@ class CGPProgram
     middle.each_with_index do |node, i|
       index = num_in + i
       # Should we mutate lhs?
-      if rand() < Config::mutate_chance
+      if rand() < mutate_chance
         middle[i][0] = (rand() * index).to_i
       end
       # rhs?
-      if rand() < Config::mutate_chance
+      if rand() < mutate_chance
         middle[i][1] = (rand() * index).to_i
       end
       # op
-      if rand() < Config::mutate_chance
+      if rand() < mutate_chance
         middle[i][2] = (rand() * NUM_OPERATORS).to_i
       end
     end
     # Go through each output:
     outs.each_with_index do |out, i|
-      if rand() < Config::mutate_chance
+      if rand() < mutate_chance
         outs[i] = (rand() * (num_in + middle.size)).to_i
       end
     end
@@ -62,7 +90,7 @@ class CGPProgram
 
   end
 
-  def initialize(str, num_inputs, num_outputs)
+  def initialize(str, num_inputs, num_outputs, debug=false)
     @num_inputs = num_inputs
     @num_outputs = num_outputs
     # So, the string.
@@ -76,8 +104,8 @@ class CGPProgram
     @middle_tokens = tokens.each_slice(3).to_a
     # Now, ahead of time, we're going to also allocate memory
     # We need a spot for each of our inputs, and middle tokens:
-    @memory = Array.new(@num_inputs + @middle_tokens.size)
-    if Config::debug_cgp
+    @memory = {}
+    if debug
       puts "Loaded program:"
       puts "  Middle Tokens: "
       @middle_tokens.each do |mt|
@@ -87,68 +115,33 @@ class CGPProgram
     end
   end
 
-  def evaluate(inputs)
-    # Alright, now the fun part.
-    # First, load up our inputs:
-    inputs.each_with_index do |input, index|
-      @memory[index] = input
+  def evaluate(inputs, debug=false)
+    @inputs = inputs
+    @memory = {}
+    outputs = @output_sources.map{|x|evaluate_node(x)}
+    if debug
+      puts outputs.join(" ")
     end
-    # Then evaluate each of our middle nodes:
-    @middle_tokens.each_with_index do |node, index|
-      @memory[index + @num_inputs] = evaluate_node(node)
-    end
-    if Config::debug_cgp
-      puts "Memory: "
-      puts "  " + @memory.join(" ")
-    end
-
-    # Finally, we'll get our outputs:
-    outputs = @output_sources.map{|x| @memory[x]}
-    # For sanity sake, we're going to limit to [0-1]
-    # Sneaky clamp method:
-    outputs = outputs.map{|o| [0, o, 1].sort[1] }
     return outputs
   end
 
-  def evaluate_node(node)
-    # A node is an array of 3 numbers:
-    # First is left side:
-    lhs = @memory[node[0]]
-    # Second is right side:
-    rhs = @memory[node[1]]
-    # Third is operator:
-    op = node[2]
-    # Return based on the operator:
-    result = 0
-    if Config::debug_cgp
-      puts "LHS: #{lhs}"
-      puts "RHS: #{rhs}"
-      puts "OP: #{op}"
+  def evaluate_node(node_index, debug=false)
+    # Are we an input node?
+    if node_index < @num_inputs
+      return @inputs[node_index]
     end
-    # To help keep things under control, everything will be kept [0-1]
-    if op == 0
-      result = lhs
-    elsif op == 1
-      result = rhs
-    elsif op == 2
-      result = Math.sqrt(((lhs + rhs)/2).abs)
-    elsif op == 3
-      result = Math.sqrt((lhs-rhs).abs)
-    elsif op == 4
-      result = [lhs + rhs,1].min
-    elsif op == 5
-      result = (lhs-rhs).abs
-    elsif op == 6
-      result = (1-lhs).abs
-    elsif op == 7
-      result = (1-rhs).abs
-    else
-      raise "Unknown operator #{op}"
+    # Do we have a cache?
+    if !@memory[node_index]
+      # Figure out which memory node we need:
+      node = @middle_tokens[node_index - @num_inputs]
+      # Get our left:
+      lhs = evaluate_node(node[0])
+      rhs = evaluate_node(node[1])
+      op = node[2]
+      result = OPERATIONS[op].call(lhs, rhs)
+      @memory[node_index] = [0,result,1].sort[1]
     end
-    if Config::debug_cgp
-      puts "Result: #{result}"
-    end
-    return [0, result, 1].sort[1]
+    return @memory[node_index]
   rescue => ex
     puts "Error:"
     puts "LHS: #{lhs}"

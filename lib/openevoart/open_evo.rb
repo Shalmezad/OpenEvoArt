@@ -32,7 +32,7 @@ class OpenEvo
     if positive_rating
       puts "Art moving on"
       # Make a child:
-      new_prog = CGPProgram.mutate(artist.program, 2,3)
+      new_prog = CGPProgram.mutate(artist.program, 2,3, Config::mutate_chance)
       new_artist = Artist.new
       new_artist.program = new_prog
       @artist_pool << new_artist
@@ -75,7 +75,7 @@ class OpenEvo
     if has_positive && has_negative
       puts "Critic moving on"
       # Make a child:
-      new_prog = CGPProgram.mutate(critic.program, 5,1)
+      new_prog = CGPProgram.mutate(critic.program, 5,1, Config::mutate_chance)
       new_critic = Critic.new
       new_critic.program = new_prog
       @critic_pool << new_critic

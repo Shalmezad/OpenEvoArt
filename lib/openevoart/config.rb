@@ -2,6 +2,7 @@ class Config
   WallpaperMini = [144,90]
   WallpaperFull = [2880, 1800]
   Youtube240 = [426, 240]
+  DebugSize = [3, 3]
 
   # Pick one of the above:
   SizeConfig = WallpaperMini
