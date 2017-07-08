@@ -1,4 +1,6 @@
 import pygame
+import os
+import glob
 pygame.init()
 
 width = 400
@@ -6,15 +8,19 @@ height = 300
 half_width = width/2
 half_height = height/2
 
-image_width = 144
-image_height = 90
-half_image_width = image_width/2
-half_image_height= image_height/2
 
 screen = pygame.display.set_mode((width,height))
 done = False
-test_image = 'out/art/1.png'
-image = pygame.image.load(test_image)
+#test_image = 'out/art/1.png'
+test_image_file = max(glob.iglob('out/art/*.png'),key = os.path.getctime)
+cur_image_file = test_image_file
+image = pygame.image.load(test_image_file)
+
+image_width = image.get_rect().size[0]
+image_height = image.get_rect().size[1]
+half_image_width = image_width/2
+half_image_height= image_height/2
+
 
 image_x = half_width - half_image_width
 image_y = half_height - half_image_height
@@ -35,8 +41,12 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
+    test_image_file = max(glob.iglob('out/art/*.png'),key = os.path.getctime)
+    if test_image_file != cur_image_file :
+        cur_image_file = test_image_file
+        pygame.time.wait(3000)
+        image = pygame.image.load(cur_image_file)
     # Background:
-    #pygame.draw.rect(screen,(20,50,20), pygame.Rect(0,0,width,height))
     screen.blit(bg_image,(0,0))
 
     # Github info

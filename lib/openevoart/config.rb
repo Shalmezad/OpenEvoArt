@@ -3,10 +3,11 @@ class Config
   WallpaperFull = [2880, 1800]
   Youtube240 = [426, 240]
   DebugSize = [3, 3]
-  ViewerSize = [400,300]
+  ViewerBGSize = [400,300]
+  ViewerRunSize = [300,200]
 
   # Pick one of the above:
-  SizeConfig = WallpaperMini
+  SizeConfig = ViewerRunSize
 
   def self.image_width
     SizeConfig[0]
