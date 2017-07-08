@@ -58,7 +58,7 @@ class CGPProgram
     return prog.flatten.join(" ")
   end
 
-  def self.mutate(prog_str, num_in, num_out, mutate_chance = 0.05)
+  def self.mutate(prog_str, num_in, num_out, mutate_chance = 0.05, grow_chance = 0.1)
     # Make a temporary program:
     prog = CGPProgram.new(prog_str, num_in, num_out)
     middle = prog.middle_tokens
@@ -78,6 +78,15 @@ class CGPProgram
       if rand() < mutate_chance
         middle[i][2] = (rand() * NUM_OPERATORS).to_i
       end
+    end
+    # Should we grow?
+    if rand() < grow_chance
+      new_node = []
+      index = num_in + middle.size
+      new_node << (rand() * index).to_i
+      new_node << (rand() * index).to_i
+      new_node << (rand() * NUM_OPERATORS).to_i
+      middle << new_node
     end
     # Go through each output:
     outs.each_with_index do |out, i|

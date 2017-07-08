@@ -16,7 +16,7 @@ end
 
 def main
   oe = OpenEvo.new
-  100.times do
+  100000.times do
     oe.step
   end
 end
