@@ -8,6 +8,8 @@ height = 300
 half_width = width/2
 half_height = height/2
 
+pygame.font.init()
+myfont = pygame.font.SysFont("monospace",15, True)
 
 screen = pygame.display.set_mode((width,height))
 done = False
@@ -15,6 +17,10 @@ done = False
 test_image_file = max(glob.iglob('out/art/*.png'),key = os.path.getctime)
 cur_image_file = test_image_file
 image = pygame.image.load(test_image_file)
+
+file_label = myfont.render(cur_image_file,
+                             1, (255,255,255))
+
 
 image_width = image.get_rect().size[0]
 image_height = image.get_rect().size[1]
@@ -25,8 +31,6 @@ half_image_height= image_height/2
 image_x = half_width - half_image_width
 image_y = half_height - half_image_height
 
-pygame.font.init()
-myfont = pygame.font.SysFont("monospace",15, True)
 
 github_label = myfont.render("Github:",
                              1, (255,255,255))
@@ -46,12 +50,17 @@ while not done:
         cur_image_file = test_image_file
         pygame.time.wait(3000)
         image = pygame.image.load(cur_image_file)
+        file_label = myfont.render(cur_image_file,
+                             1, (255,255,255))
+
     # Background:
     screen.blit(bg_image,(0,0))
 
     # Github info
     screen.blit(github_label,(10,10))
     screen.blit(github_label2,(10,24))
+    # File label
+    screen.blit(file_label, (10, height-20))
 
     # Border:
     pygame.draw.rect(screen,(255,255,255),
