@@ -22,8 +22,16 @@ class Critic
         xf = x.to_f / Config::image_width
         yf = y.to_f / Config::image_height
         pixel = image[x,y]
-        hsv = ChunkyPNG::Color.to_hsv(pixel)
-        o = prog.evaluate([xf, yf, hsv[0]/360.0, hsv[1], hsv[2]])
+        o = [0]
+        if Config::use_hsv
+          hsv = ChunkyPNG::Color.to_hsv(pixel)
+          o = prog.evaluate([xf, yf, hsv[0]/360.0, hsv[1], hsv[2]])
+        else
+          r = ChunkyPNG::Color.r(pixel)
+          g = ChunkyPNG::Color.g(pixel)
+          b = ChunkyPNG::Color.b(pixel)
+          o = prog.evaluate([xf, yf, r/255.0, g/255.0, b/255.0])
+        end
         total_rating += o[0]
       end
     end

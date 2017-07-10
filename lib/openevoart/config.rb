@@ -17,6 +17,10 @@ class Config
     SizeConfig[1]
   end
 
+  def self.use_hsv
+    false
+  end
+
 
   # Initial queue sizes
   def self.critic_start_size
